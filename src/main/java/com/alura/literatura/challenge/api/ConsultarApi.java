@@ -8,6 +8,9 @@ import java.net.http.HttpResponse;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Component
 public class ConsultarApi {
 
@@ -41,24 +44,39 @@ public class ConsultarApi {
 
         String json = response.body();
 
-        String primerResultado = "";
+        ObjectMapper mapper = new ObjectMapper();
+
 
         try {
-            int resultInicio = json.indexOf("\"results\":")+10;
+            JsonNode rootNode = mapper.readTree(json);
+            JsonNode results = rootNode.path("results");
 
-            int primerLibroInicio = json.indexOf("{", resultInicio);
-            int primerLibroFinal = json.indexOf("}", primerLibroInicio) + 1;
-
-            primerResultado = json.substring(primerLibroInicio, primerLibroFinal) + "]}";
-            
+            if (results.isArray() && results.size() > 0) {
+                JsonNode primerResultado = results.get(0);
+                return primerResultado.toString();
+            } else {
+                throw new RuntimeException("No se encontro resultados");
+            }
         } catch (Exception e) {
-            throw new RuntimeException("Error al procesar el json " + e);
+              throw new RuntimeException("Error al procesar el JSON", e);
         }
 
 
-        
+        // String primerResultado = "";
 
-        System.out.println(primerResultado);
-        return primerResultado;
+        // try {
+        //     int resultInicio = json.indexOf("\"results\":")+10;
+
+        //     int primerLibroInicio = json.indexOf("{", resultInicio);
+        //     int primerLibroFinal = json.indexOf("}", primerLibroInicio) + 1;
+
+        //     primerResultado = json.substring(primerLibroInicio, primerLibroFinal) + "]}";
+            
+        // } catch (Exception e) {
+        //     throw new RuntimeException("Error al procesar el json " + e);
+        // }
+
+        // System.out.println(primerResultado);
+        // return primerResultado;
     }
 }

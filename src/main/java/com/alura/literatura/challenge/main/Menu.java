@@ -1,16 +1,21 @@
 package com.alura.literatura.challenge.main;
 
+import java.util.List;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.alura.literatura.challenge.api.ConsultarApi;
-import com.alura.literatura.challenge.models.DatosAutor;
+import com.alura.literatura.challenge.entites.Autor;
+import com.alura.literatura.challenge.entites.Obra;
 import com.alura.literatura.challenge.models.DatosObra;
 import com.alura.literatura.challenge.services.ConvertirDatos;
 import com.alura.literatura.challenge.services.IAutorService;
 import com.alura.literatura.challenge.services.IObraService;
 
+
+@Component
 public class Menu {
     Scanner teclado = new Scanner(System.in);
 
@@ -39,11 +44,10 @@ public class Menu {
 
     }
 
-    public void play() {
-
+  public void play() {
         boolean salir = false;
 
-        while (salir != true) {
+        while (!salir) {
             int opcion = opciones();
             switch (opcion) {
                 case 0:
@@ -54,33 +58,81 @@ public class Menu {
                     System.out.println("Ingrese el nombre del libro que deseas buscar: ");
                     String titulo = teclado.nextLine();
                     DatosObra datos = geDatosAutor(titulo);
-                    System.out.println(datos);
+
+                   
+                    Autor autor = datos.autor().stream()
+                        .findFirst() 
+                        .map(a -> {
+                            Autor nuevoAutor = new Autor();
+                            nuevoAutor.setNombreCompleto(a.getNombreCompleto());
+                            nuevoAutor.setAñoNacido(a.getAñoNacido());
+                            nuevoAutor.setAñoFallecido(a.getAñoFallecido());
+                            return nuevoAutor;
+                        }).orElse(null);
+
+                    if (autor != null) {
+                        autorService.createAutor(autor);
+                    }
+
+                    // Crear la obra asociada
+                    Obra obra = new Obra();
+                    obra.setAutor(autor);
+                    obra.setTitulo(datos.titulo());
+                    obra.setIdioma(datos.idioma().stream().findFirst().orElse("")); // Asignar primer idioma
+                    obra.setNumeroDescargas(datos.numeroDescargas());
+
+                    obraService.createObra(obra);
+
+                    // Imprimir información una sola vez
+                    System.out.println("---- Libro ----");
+                    System.out.println("Titulo: " + obra.getTitulo());
+                    System.out.println("Autor: " + autor.getNombreCompleto());
+                    System.out.println("Fecha de nacimiento: " + autor.getAñoNacido());
+                    System.out.println("Fecha de fallecimiento: " + autor.getAñoFallecido());
+                    System.out.println("Idioma: " + obra.getIdioma());
+                    System.out.println("Numero de descargas: " + obra.getNumeroDescargas());
                     break;
+
                 case 2:
-                    System.out.println("LibrosRegistrados");
+                    System.out.println("Libros Registrados");
+                    List<Obra> obras = obraService.findObras();
+                    obras.forEach(System.out::println);
                     break;
                 case 3:
-                    System.out.println("AutoresRegistrados");
+                    System.out.println("Autores Registrados");
+                    List<Autor> autores = autorService.findAutors();
+                    autores.forEach(System.out::println);
                     break;
                 case 4:
-                    System.out.println("AutoresVivosAño");
+                    List<Autor> autoresPorAño = autoresVivosPorAño();
+                    System.out.println("Autores Vivos Año\n");
+                    autoresPorAño.forEach(System.out::println);
                     break;
                 case 5:
                     System.out.println("Libros Por Idioma");
                     break;
                 default:
-                    System.out.println("La opcion " + opcion + "no existe");
+                    System.out.println("La opcion " + opcion + " no existe");
                     break;
             }
         }
-        
     }
-
 
     private DatosObra geDatosAutor(String nombreObra) {
         var json = api.consultar(nombreObra);
         DatosObra datos = convertir.obtenerDatos(json, DatosObra.class);
         return datos;
+    }
+
+    private List<Autor> autoresVivosPorAño() {
+
+        System.out.println("Ingrese el año que deseas buscar: ");
+        Integer año = teclado.nextInt();
+        teclado.nextLine();
+
+        List<Autor> autores = autorService.findAutorsByYear(año);
+        
+        return autores;
     }
 
 

@@ -10,5 +10,5 @@ public interface IAutorService {
 
     List<Autor> findAutors();
 
-    List<Autor> findAutorsByYear(int year);
+    List<Autor> findAutorsByYear(Integer year);
 }

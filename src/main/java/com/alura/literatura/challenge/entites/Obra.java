@@ -23,7 +23,7 @@ public class Obra {
     @Column(name = "languages")
     private String idioma;
     @Column(name = "download_count")
-    private Long numeroDescargas;
+    private Integer numeroDescargas;
 
     @ManyToOne
     @JoinColumn(name = "id_autor", nullable = false)
@@ -68,12 +68,12 @@ public class Obra {
 
 
     @JsonProperty("download_count")
-    public Long getNumeroDescargas() {
+    public Integer getNumeroDescargas() {
         return numeroDescargas;
     }
 
 
-    public void setNumeroDescargas(Long numeroDescargas) {
+    public void setNumeroDescargas(Integer numeroDescargas) {
         this.numeroDescargas = numeroDescargas;
     }
 
@@ -91,7 +91,7 @@ public class Obra {
         StringBuilder string = new StringBuilder("\n---- Libro ----\nTitulo: ");
         string.append(titulo);
         string.append("\nAutor: ");
-        string.append(autor);
+        string.append(autor.getNombreCompleto());
         string.append("\nIdioma: ");
         string.append(idioma);
         string.append("\nNumero de descargas: ");

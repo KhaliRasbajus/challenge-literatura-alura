@@ -2,11 +2,13 @@ package com.alura.literatura.challenge.entites;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,7 +32,8 @@ public class Autor {
     private Integer añoFallecido;
 
 
-    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonIgnore
     private Set<Obra> obras;
 
     public Autor() {
@@ -90,7 +93,9 @@ public class Autor {
         string.append("\nFecha de fallecimiento: ");
         string.append(añoFallecido);
         string.append("\nLibros: [ ");
-        string.append(obras);
+        obras.forEach(o -> {
+            string.append(o.getTitulo());
+        });
         string.append(" ]");
         return string.toString();
     }

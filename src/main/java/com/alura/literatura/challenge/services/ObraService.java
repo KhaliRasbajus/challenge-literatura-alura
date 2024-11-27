@@ -33,7 +33,7 @@ public class ObraService implements IObraService {
     @Override
     public List<Obra> findObras() {
        
-        return null;
+        return (List<Obra>) obraRepository.findAllWithAuthors();
     }
 
     
