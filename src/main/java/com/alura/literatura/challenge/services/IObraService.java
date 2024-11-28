@@ -9,7 +9,12 @@ public interface IObraService {
 
     Obra createObra(Obra obra);
 
-    Optional<Obra> findObraByTitle(String titulo);
+    List<Obra> findObraByTitle(String titulo);
+
     List<Obra> findObras();
+    
+
+    Optional<Obra> findByTitulo(String titulo);
+    
 
 }

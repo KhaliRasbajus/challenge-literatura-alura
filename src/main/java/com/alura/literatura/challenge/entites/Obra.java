@@ -96,6 +96,7 @@ public class Obra {
         string.append(idioma);
         string.append("\nNumero de descargas: ");
         string.append(numeroDescargas);
+        string.append("\n-------------------\n");
         return string.toString();
     }
     

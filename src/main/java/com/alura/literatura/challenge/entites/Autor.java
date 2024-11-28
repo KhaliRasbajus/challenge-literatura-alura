@@ -97,6 +97,7 @@ public class Autor {
             string.append(o.getTitulo());
         });
         string.append(" ]");
+         string.append("\n-------------------\n");
         return string.toString();
     }
     

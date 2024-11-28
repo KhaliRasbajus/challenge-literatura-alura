@@ -1,6 +1,7 @@
 package com.alura.literatura.challenge.main;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.alura.literatura.challenge.api.ConsultarApi;
 import com.alura.literatura.challenge.entites.Autor;
 import com.alura.literatura.challenge.entites.Obra;
+import com.alura.literatura.challenge.enums.LANGUAGES;
 import com.alura.literatura.challenge.models.DatosObra;
 import com.alura.literatura.challenge.services.ConvertirDatos;
 import com.alura.literatura.challenge.services.IAutorService;
@@ -57,6 +59,13 @@ public class Menu {
                 case 1:
                     System.out.println("Ingrese el nombre del libro que deseas buscar: ");
                     String titulo = teclado.nextLine();
+
+                    Optional<Obra> obraExiste = obraService.findByTitulo(titulo);
+
+                    if (obraExiste.isPresent()) {
+                        System.out.println("No se puede guardar la obra " + "'" + titulo + "'" + " otra vez");
+                        break;
+                    }
                     DatosObra datos = geDatosAutor(titulo);
 
                    
@@ -105,11 +114,11 @@ public class Menu {
                     break;
                 case 4:
                     List<Autor> autoresPorAño = autoresVivosPorAño();
-                    System.out.println("Autores Vivos Año\n");
                     autoresPorAño.forEach(System.out::println);
                     break;
                 case 5:
-                    System.out.println("Libros Por Idioma");
+                    List<Obra> librosPorIdiomas = obrasPorIdioma();
+                    librosPorIdiomas.forEach(System.out::println);
                     break;
                 default:
                     System.out.println("La opcion " + opcion + " no existe");
@@ -131,8 +140,51 @@ public class Menu {
         teclado.nextLine();
 
         List<Autor> autores = autorService.findAutorsByYear(año);
-        
+        if (autores.size() > 0) {
+            System.out.println("Autores vivos en el año: " + año + "\n");
+        } else {
+            System.out.println("No hay Autores vivos en el año: " + año + " \n");
+        }
         return autores;
+    }
+    
+
+    private List<Obra> obrasPorIdioma() {
+
+        String idioma = "";
+        System.out.println("Seleccione el idioma que deseas buscar");
+        System.out.println("1- Español");
+        System.out.println("2- Ingles");
+        System.out.println("3- Frances");
+        System.out.println("4- Portuges");
+        
+        Integer opcion = teclado.nextInt();
+        teclado.nextLine();
+        switch (opcion) {
+            case 1:
+                idioma = LANGUAGES.ES.toString().toLowerCase();
+                break;
+            case 2: 
+                idioma = LANGUAGES.EN.toString().toLowerCase();
+                break;
+            case 3:
+                idioma = LANGUAGES.FR.toString().toLowerCase();
+                break;
+            case 4:
+                idioma = LANGUAGES.PT.toString().toLowerCase();
+                break;
+            default:
+                System.out.println("La opcion: " + opcion + "no existe ");
+                break;
+        }
+
+        List<Obra> obras = obraService.findObraByTitle(idioma);
+         if (obras.size() > 0) {
+            System.out.println("Libros en el idioma: " + idioma+"\n");
+        } else {
+            System.out.println("No hay Libros en el idioma: " + idioma+" \n" );
+        }
+        return obras;
     }
 
 

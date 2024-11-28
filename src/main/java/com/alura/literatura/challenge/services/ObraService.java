@@ -1,5 +1,6 @@
 package com.alura.literatura.challenge.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,16 +26,29 @@ public class ObraService implements IObraService {
     }
 
     @Override
-    public Optional<Obra> findObraByTitle(String titulo) {
+    public List<Obra> findObraByTitle(String titulo) {
+
+
+        Optional<List<Obra>> obras = obraRepository.findAllWithLanguages(titulo);
         
-        return Optional.empty();
+        return obras.orElse(new ArrayList<>());
+
     }
 
     @Override
     public List<Obra> findObras() {
-       
+
         return (List<Obra>) obraRepository.findAllWithAuthors();
     }
+
+    @Override
+    public Optional<Obra> findByTitulo(String titulo) {
+        Optional<Obra> obra = obraRepository.findByTitulo(titulo);
+        
+        return obra;
+    }
+    
+    
 
     
 }
