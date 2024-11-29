@@ -88,7 +88,7 @@ public class Obra {
 
     @Override
     public String toString() {
-        StringBuilder string = new StringBuilder("\n---- Libro ----\nTitulo: ");
+        StringBuilder string = new StringBuilder("\n---------- Libro ----------\nTitulo: ");
         string.append(titulo);
         string.append("\nAutor: ");
         string.append(autor.getNombreCompleto());
@@ -96,7 +96,7 @@ public class Obra {
         string.append(idioma);
         string.append("\nNumero de descargas: ");
         string.append(numeroDescargas);
-        string.append("\n-------------------\n");
+        string.append("\n--------------------\n");
         return string.toString();
     }
     

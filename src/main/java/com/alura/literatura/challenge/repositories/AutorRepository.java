@@ -18,6 +18,10 @@ public interface AutorRepository extends JpaRepository<Autor, Long> {
 
 
     @Query("select a from Autor a join fetch a.obras where a.añoNacido=?1")
-     Optional<List<Autor>> findAllByBirthYear(Integer year);
+    Optional<List<Autor>> findAllByBirthYear(Integer year);
+     
+
+    @Query("Select a from Autor a where LOWER(a.nombreCompleto)=LOWER(?1)")
+    Optional<Autor> findAutorsByName(String name);
 
 }

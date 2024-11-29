@@ -29,11 +29,24 @@ public class AutorService implements IAutorService {
 
     @Override
     public List<Autor> findAutorsByYear(Integer year) {
-        
+
         Optional<List<Autor>> autoresAño = autorRepository.findAllByBirthYear(year);
 
         return autoresAño.orElse(new ArrayList<>());
-        
+
     }
+
+    @Override
+    public Optional<Autor> findAutorsByName(List<Autor> autores) {
+
+        return autores.stream()
+            .map(a -> autorRepository.findAutorsByName(a.getNombreCompleto()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+    }
+    
+    
+    
     
 }

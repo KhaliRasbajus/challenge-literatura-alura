@@ -55,7 +55,7 @@ public class ConsultarApi {
                 JsonNode primerResultado = results.get(0);
                 return primerResultado.toString();
             } else {
-                throw new RuntimeException("No se encontro resultados");
+                return null;
             }
         } catch (Exception e) {
               throw new RuntimeException("Error al procesar el JSON", e);

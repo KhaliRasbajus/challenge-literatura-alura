@@ -1,6 +1,8 @@
 package com.alura.literatura.challenge.entites;
 
+import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -37,7 +39,7 @@ public class Autor {
     private Set<Obra> obras;
 
     public Autor() {
-
+        obras = new HashSet<>();
     }
 
     public Long getId() {
@@ -92,12 +94,21 @@ public class Autor {
         string.append(añoNacido);
         string.append("\nFecha de fallecimiento: ");
         string.append(añoFallecido);
-        string.append("\nLibros: [ ");
-        obras.forEach(o -> {
-            string.append(o.getTitulo());
-        });
-        string.append(" ]");
-         string.append("\n-------------------\n");
+        if (obras != null && !obras.isEmpty()) {
+            string.append("\nLibros: [ ");
+            AtomicInteger contador = new AtomicInteger(0);
+            int sizeObra = obras.size();
+            obras.forEach(o -> {
+                string.append(o.getTitulo());
+                if (contador.incrementAndGet() < sizeObra) {
+                    string.append(", ");
+                }
+            });
+            string.append(" ]");
+        } else {
+            string.append("\nLibros: [ No hay libros registrados ]\n");
+        }
+       
         return string.toString();
     }
     

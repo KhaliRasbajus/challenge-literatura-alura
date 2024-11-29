@@ -63,43 +63,16 @@ public class Menu {
                     Optional<Obra> obraExiste = obraService.findByTitulo(titulo);
 
                     if (obraExiste.isPresent()) {
-                        System.out.println("No se puede guardar la obra " + "'" + titulo + "'" + " otra vez");
+                        System.out.println("\nNo se puede guardar la obra " + "'" + titulo + "'" + " otra vez");
                         break;
                     }
                     DatosObra datos = geDatosAutor(titulo);
 
-                   
-                    Autor autor = datos.autor().stream()
-                        .findFirst() 
-                        .map(a -> {
-                            Autor nuevoAutor = new Autor();
-                            nuevoAutor.setNombreCompleto(a.getNombreCompleto());
-                            nuevoAutor.setAñoNacido(a.getAñoNacido());
-                            nuevoAutor.setAñoFallecido(a.getAñoFallecido());
-                            return nuevoAutor;
-                        }).orElse(null);
-
-                    if (autor != null) {
-                        autorService.createAutor(autor);
+                    if (datos == null) {
+                        System.out.println("\nNo se encontro el libro");
+                    }else {
+                        agregarObra(datos);
                     }
-
-                    // Crear la obra asociada
-                    Obra obra = new Obra();
-                    obra.setAutor(autor);
-                    obra.setTitulo(datos.titulo());
-                    obra.setIdioma(datos.idioma().stream().findFirst().orElse("")); // Asignar primer idioma
-                    obra.setNumeroDescargas(datos.numeroDescargas());
-
-                    obraService.createObra(obra);
-
-                    // Imprimir información una sola vez
-                    System.out.println("---- Libro ----");
-                    System.out.println("Titulo: " + obra.getTitulo());
-                    System.out.println("Autor: " + autor.getNombreCompleto());
-                    System.out.println("Fecha de nacimiento: " + autor.getAñoNacido());
-                    System.out.println("Fecha de fallecimiento: " + autor.getAñoFallecido());
-                    System.out.println("Idioma: " + obra.getIdioma());
-                    System.out.println("Numero de descargas: " + obra.getNumeroDescargas());
                     break;
 
                 case 2:
@@ -129,6 +102,9 @@ public class Menu {
 
     private DatosObra geDatosAutor(String nombreObra) {
         var json = api.consultar(nombreObra);
+        if (json == null) {
+            return null;
+        }
         DatosObra datos = convertir.obtenerDatos(json, DatosObra.class);
         return datos;
     }
@@ -141,9 +117,9 @@ public class Menu {
 
         List<Autor> autores = autorService.findAutorsByYear(año);
         if (autores.size() > 0) {
-            System.out.println("Autores vivos en el año: " + año + "\n");
+            System.out.println("\nAutores vivos en el año: " + año + "\n");
         } else {
-            System.out.println("No hay Autores vivos en el año: " + año + " \n");
+            System.out.println("\nNo hay Autores vivos en el año: " + año + " \n");
         }
         return autores;
     }
@@ -188,4 +164,47 @@ public class Menu {
     }
 
 
+    private void agregarObra(DatosObra  datos) {
+        
+
+        Autor autor;
+
+        System.out.println(datos);
+        
+        Optional<Autor> autorExiste = autorService.findAutorsByName(datos.autor());
+
+        
+        if (autorExiste.isPresent()) {
+            autor = autorExiste.get();
+        } else {
+            autor = datos.autor().stream()
+            .findFirst()
+            .map(a -> {
+                Autor nuevoAutor = new Autor();
+                nuevoAutor.setNombreCompleto(a.getNombreCompleto());
+                nuevoAutor.setAñoNacido(a.getAñoNacido());
+                nuevoAutor.setAñoFallecido(a.getAñoFallecido());
+                autorService.createAutor(nuevoAutor);
+                return nuevoAutor;
+            }).orElse(null);
+        }
+
+        // Crear la obra asociada
+        Obra obra = new Obra();
+        obra.setAutor(autor);
+        obra.setTitulo(datos.titulo());
+        obra.setIdioma(datos.idioma().stream().findFirst().orElse("")); // Asignar primer idioma
+        obra.setNumeroDescargas(datos.numeroDescargas());
+
+        obraService.createObra(obra);
+
+        // Imprimir información una sola vez
+        System.out.println("---- Libro ----");
+        System.out.println("Titulo: " + obra.getTitulo());
+        System.out.println("Autor: " + autor.getNombreCompleto());
+        System.out.println("Fecha de nacimiento: " + autor.getAñoNacido());
+        System.out.println("Fecha de fallecimiento: " + autor.getAñoFallecido());
+        System.out.println("Idioma: " + obra.getIdioma());
+        System.out.println("Numero de descargas: " + obra.getNumeroDescargas());
+    }
 }
